@@ -109,6 +109,7 @@ st.subheader("各装置の関係図(動作中)")
 # 動的メモリ内容
 mem_labels = "
 ".join([f"番地{addr}: {memory[addr]}" for addr in sorted(memory.keys(), key=int)])
+".join([f"番地{addr}: {memory[addr]}" for addr in sorted(memory.keys(), key=int)])
 # CPU内部状態
 regA_val = memory['7']
 regB_val = memory['8']
