@@ -117,13 +117,18 @@ res_val = memory['9'] if memory['9'] != '' else (regA_val + regB_val if step >= 
 active = 'memory' if step in (1,7) else 'cpu' if 2 <= step <= 6 else None
 
 # Graphvizで見やすくスタイル設定
+mem_html = mem_labels.replace("
+", "<BR/>")
+color_mem = '#FFEEBA' if active=='memory' else 'black'
+color_cpu = '#A3E4A1' if active=='cpu' else 'black'
+# Graphvizソースを組み立て
 dot2 = f"""
 digraph devices {{
   graph [nodesep=1.0, ranksep=1.0];
   node [shape=box, style=filled, fontname=\"Helvetica\", fontsize=24, width=2, height=1];
 
-  memory [label=<{ {mem_labels.replace(chr(10), '<BR/>')} }>, fillcolor=\"#FFF3CD\", color=\"{'#FFEEBA' if active=='memory' else 'black'}\"];  
-  cpu    [label=<{CPU<BR/>PC={pc_val}<BR/>A={regA_val} B={regB_val}<BR/>結果={res_val}>}, fillcolor=\"#D4EDDA\", color=\"{'#A3E4A1' if active=='cpu' else 'black'}\"];  
+  memory [label=<{mem_html}>, fillcolor=\"#FFF3CD\", color=\"{color_mem}\"];  
+  cpu    [label=<<BR/>PC={pc_val}<BR/>A={regA_val} B={regB_val}<BR/>結果={res_val}>, fillcolor=\"#D4EDDA\", color=\"{color_cpu}\"];  
   keyboard [label=\"キーボード\", fillcolor=\"#F8D7DA\", color=\"black\"];  
   display  [label=\"ディスプレイ\", fillcolor=\"#D1ECF1\", color=\"black\"];  
 
@@ -134,4 +139,5 @@ digraph devices {{
 }}
 """
 # 図を表示
+st.subheader("各装置の関係図(動作中)")
 st.graphviz_chart(dot2)
