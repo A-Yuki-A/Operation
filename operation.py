@@ -23,17 +23,25 @@ with st.sidebar:
     st.header("入力パネル")
     A = st.number_input("値Aを入力", value=0, step=1)
     B = st.number_input("値Bを入力", value=0, step=1)
-    st.write("命令セット:")
-    st.write("0x00: READ A, (4) → レジスタAに番地4のデータを読み込む")
-    st.write("0x01: ADD A, (5) → レジスタAの値に番地5のデータを加算する")
-    st.write("0x02: WRITE (6), A → 計算結果をレジスタAから番地6に書き戻す")
-    st.write("0x03: STOP → プログラムの実行を停止する")
-    st.write("データ配置:")
-    st.write("0x04: B の値")
-    st.write("0x05: -- (未使用)")
-    st.write("0x06: A の値")
-    st.write("0x07: B の値")
-    st.write("0x08: C (結果保存)")
+    st.write("命令セット (番地と説明)")
+    commands = [
+        ("0x00: READ A, (4)", "レジスタAに番地4のデータを読み込む"),
+        ("0x01: ADD A, (5)", "レジスタAの値に番地5のデータを加算する"),
+        ("0x02: WRITE (6), A", "レジスタAの値を番地6に書き戻す"),
+        ("0x03: STOP", "プログラムの実行を停止する")
+    ]
+    for code, desc in commands:
+        st.write(f"- {code}  →  {desc}")
+    st.write("データ配置 (番地と内容)")
+    data_layout = [
+        ("0x04", "--"),
+        ("0x05", "--"),
+        ("0x06", f"A = {A}"),
+        ("0x07", f"B = {B}"),
+        ("0x08", "C (結果保存)")
+    ]
+    for addr, val in data_layout:
+        st.write(f"- {addr}: {val}")
     if st.button("次へ (命令実行)"):
         next_step()
     if st.button("リセット"):
@@ -48,7 +56,8 @@ dot = ['digraph G {','  rankdir=LR;','  node [shape=box,fontname="Helvetica"];']
 for i,l in enumerate(labels):
     style = 'style=filled,fillcolor="lightblue"' if i < step else ''
     dot.append(f'  n{i} [{style} label="{l}"];')
-for i in range(len(labels)-1): dot.append(f'  n{i} -> n{i+1};')
+for i in range(len(labels)-1):
+    dot.append(f'  n{i} -> n{i+1};')
 dot.append('}')
 
 # フローチャート表示
@@ -58,23 +67,21 @@ st.graphviz_chart("\n".join(dot))
 # ステップ詳細
 if step >= 1:
     st.subheader('ステップ1: 主記憶装置にデータ／命令を格納')
-    # メモリ内容をテーブルで表示（C は空に）
     mem = pd.DataFrame({
         '番地': list(range(1,10)),
         '内容': [
-            'READ A, (4)',
-            'ADD A, (5)',
-            'WRITE (6), A',
-            'STOP',
+            'READ A, (4) → レジスタAに番地4のデータを読み込む',
+            'ADD A, (5) → レジスタAに番地5のデータを加算する',
+            'WRITE (6), A → レジスタAの値を番地6に書き戻す',
+            'STOP → プログラム停止',
             '--',
             '--',
             f'A = {A}',
             f'B = {B}',
-            ''  # C はまだ空
+            ''
         ]
     })
     st.table(mem)
-
 if step >= 2:
     st.subheader('ステップ2: プログラムカウンタ → 命令番地指示')
     st.write('PC が 番地1 を指しています。次に実行する命令です。')
@@ -84,7 +91,7 @@ if step >= 3:
     st.write(f"IR に命令 '{inst}' が読み込まれました。")
 if step >= 4:
     st.subheader("ステップ4: 命令解読器が命令を解読")
-    st.write("命令解読器が 'READ A → レジスタA にアドレス4の内容を取得' と解釈しました。")
+    st.write("命令解読器が 'READ A → レジスタA に番地4の内容を取得' と解釈しました。")
 if step >= 5:
     st.subheader("ステップ5: レジスタにデータを転送")
     st.write(f"レジスタA ← メモリ[0x04] ({B})")
@@ -94,6 +101,6 @@ if step >= 6:
     st.write(f"ALU: レジスタA({B}) + レジスタB({A}) = {result}")
 if step >= 7:
     st.subheader("ステップ7: 結果を主記憶装置に書き戻し")
-    st.write(f"主記憶 0x08: C ← {result}")
+    st.write(f"主記憶 番地8: C ← {result}")
     st.success(f"命令実行完了: C = {result}")
     st.info("リセットして再度体験できます。")
