@@ -57,17 +57,17 @@ st.graphviz_chart("\n".join(dot))
 
 # ステップ詳細
 if step >= 1:
-    st.subheader("ステップ1: 主記憶装置にデータ／命令を格納")
+    st.subheader('ステップ1: 主記憶装置にデータ／命令を格納')
     # メモリ内容をテーブルで表示（C は空に）
     mem = pd.DataFrame({
-        'アドレス': ['0x00','0x01','0x02','0x03','0x04','0x05','0x06','0x07','0x08'],
+        '番地': list(range(1,10)),
         '内容': [
             'READ A, (4)',
             'ADD A, (5)',
             'WRITE (6), A',
             'STOP',
-            f'--',
-            f'--',
+            '--',
+            '--',
             f'A = {A}',
             f'B = {B}',
             ''  # C はまだ空
@@ -76,8 +76,8 @@ if step >= 1:
     st.table(mem)
 
 if step >= 2:
-    st.subheader("ステップ2: プログラムカウンタ → 命令アドレス指示")
-    st.write("PC が 0x00 を指しています。次に実行する命令です。")
+    st.subheader('ステップ2: プログラムカウンタ → 命令番地指示')
+    st.write('PC が 番地1 を指しています。次に実行する命令です。')")
 if step >= 3:
     st.subheader("ステップ3: 命令レジスタに命令を読み込み")
     inst = 'READ A, (4)'
