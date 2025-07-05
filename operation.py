@@ -110,15 +110,9 @@ st.subheader("各装置の関係図(動作中)")
 # 動的メモリ内容
 mem_labels = "
 ".join([f"番地{addr}: {memory[addr]}" for addr in sorted(memory.keys(), key=int)])
-# CPU内部状態
-regA_val = memory['7']
-regB_val = memory['8']
-res_val  = memory['9'] if memory['9'] != '' else (regA_val + regB_val if step >= 6 else '')
-# アクティブ装置判定
-active = 'memory' if step in (1,7) else 'cpu' if 2 <= step <= 6 else None
-
-# Graphvizで見やすくスタイル設定
+# HTML 改行置換
 mem_html  = mem_labels.replace("
+", "<BR/>")
 ", "<BR/>")
 color_mem = "#FFEEBA" if active=="memory" else "black"
 color_cpu = "#A3E4A1" if active=="cpu" else "black"
