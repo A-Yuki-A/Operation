@@ -64,7 +64,8 @@ dot = ['digraph G {','  rankdir=LR;','  node[shape=box,fontname="Helvetica"];']
 for i,label in enumerate(labels):
     style = 'style=filled,fillcolor="lightblue"' if i < step else ''
     dot.append(f'  n{i} [{style} label="{label}"];')
-for i in range(len(labels)-1): dot.append(f'  n{i} -> n{i+1};')
+for i in range(len(labels)-1):
+    dot.append(f'  n{i} -> n{i+1};')
 dot.append('}')
 st.subheader("命令実行フロー（フローチャート）")
 st.graphviz_chart("\n".join(dot))
@@ -107,8 +108,7 @@ if step >= 7:
 # 各装置の関係図: メモリとCPUダイナミック表示
 st.subheader("各装置の関係図(動作中)")
 # 動的メモリ内容
-mem_labels = "
-".join([f"番地{addr}: {memory[addr]}" for addr in sorted(memory.keys(), key=int)])
+mem_labels = "\n".join([f"番地{addr}: {memory[addr]}" for addr in sorted(memory.keys(), key=int)])
 # CPU内部状態
 regA_val = memory['7']
 regB_val = memory['8']
@@ -120,16 +120,12 @@ active = 'memory' if step in (1,7) else 'cpu' if 2 <= step <= 6 else None
 dot2 = f"""
 digraph devices {{
   graph [nodesep=1.0, ranksep=1.0];
-  node [shape=box, style=filled, fontname="Helvetica", fontsize=24, width=2, height=1];
+  node [shape=box, style=filled, fontname=\"Helvetica\", fontsize=24, width=2, height=1];
 
-  memory [label="主記憶装置
-{mem_labels}", fillcolor="#FFF3CD", color="{'#FFEEBA' if active=='memory' else 'black'}"];
-  cpu    [label="CPU
-PC={pc_val}
-A={regA_val} B={regB_val}
-結果={res_val}", fillcolor="#D4EDDA", color="{'#A3E4A1' if active=='cpu' else 'black'}"];
-  keyboard [label="キーボード", fillcolor="#F8D7DA", color="black"];
-  display  [label="ディスプレイ", fillcolor="#D1ECF1", color="black"];
+  memory [label=<{ {mem_labels.replace(chr(10), '<BR/>')} }>, fillcolor=\"#FFF3CD\", color=\"{'#FFEEBA' if active=='memory' else 'black'}\"];  
+  cpu    [label=<{CPU<BR/>PC={pc_val}<BR/>A={regA_val} B={regB_val}<BR/>結果={res_val}>}, fillcolor=\"#D4EDDA\", color=\"{'#A3E4A1' if active=='cpu' else 'black'}\"];  
+  keyboard [label=\"キーボード\", fillcolor=\"#F8D7DA\", color=\"black\"];  
+  display  [label=\"ディスプレイ\", fillcolor=\"#D1ECF1\", color=\"black\"];  
 
   keyboard -> cpu [arrowsize=2];
   cpu -> display  [arrowsize=2];
