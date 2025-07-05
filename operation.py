@@ -63,60 +63,20 @@ def show_status(pc=None, inst=None, regA=None, regB=None, result=None):
 
 step = st.session_state.step
 
-# フロー図を固定するプレースホルダ
-graph_placeholder = st.empty()
-
-# ステップ表示補助
-def show_step(text):
-    st.markdown(f"<div class='step-header'>{text}</div>", unsafe_allow_html=True)
-
-# 各ステップ詳細表示
-if step >= 1:
-    show_step('ステップ1: 主記憶装置にデータ／命令を格納')
-    df = pd.DataFrame.from_dict(data, orient='index', columns=['内容'])
-    df.index.name = '番地'
-    st.table(df)
-    show_status(pc=1)
-if step >= 2:
-    show_step('ステップ2: プログラムカウンタが命令を指す')
-    show_status(pc=1)
-if step >= 3:
-    show_step('ステップ3: 命令を読み込む')
-    inst = data['1']
-    show_status(pc=2, inst=inst)
-if step >= 4:
-    show_step('ステップ4: 命令を解釈')
-    show_status(pc=2, inst=inst)
-if step >= 5:
-    show_step('ステップ5: レジスタAにデータ転送')
-    regA = data['7']
-    show_status(pc=3, inst=inst, regA=regA)
-if step >= 6:
-    show_step('ステップ6: 演算を実行')
-    regA = data['7']; regB = data['8']
-    result = regA + regB
-    show_status(pc=3, inst=inst, regA=regA, regB=regB, result=result)
-if step >= 7:
-    show_step('ステップ7: 結果を主記憶装置に書き戻し')
-    data['9'] = result
-    show_status(pc=4, inst=data['2'], regA=regA, regB=regB, result=result)
-    st.success(f"完了: 番地9に演算結果 {result} を格納しました。")
-
-# 各装置の関係図を描画（固定）
+# 各装置の関係図を描画 (左カラム)
 # メモリ内容
 mem_labels = "\n".join([f"番地{addr}: {data[addr]}" for addr in sorted(data.keys(), key=int)])
 mem_html = mem_labels.replace("\n", "<BR/>")
 # CPU状態
-pc_val  = step if step > 0 else 1
+pc_val   = step if step > 0 else 1
 regA_val = data['7']; regB_val = data['8']
 res_val  = data['9'] if data['9'] != '' else (regA_val + regB_val if step >= 6 else '')
-# アクティブ装置
+# アクティブ装置判定
 active = 'memory' if step in (1,7) else 'cpu' if 2 <= step <= 6 else None
 color_mem = "#FFEEBA" if active == 'memory' else "#FFF3CD"
 color_cpu = "#A3E4A1" if active == 'cpu' else "#D4EDDA"
-# CPUラベルHTML
 cpu_html = f"PC={pc_val}<BR/>A={regA_val}<BR/>B={regB_val}<BR/>結果={res_val}"
-# Graphvizソース (レイアウト固定)
+# Graphvizソース
 source = f'''digraph devices {{
   graph [nodesep=1.0, ranksep=1.0];
   node [shape=box, style=filled, fontname="Helvetica", fontsize=24, width=2, height=1];
@@ -129,5 +89,46 @@ source = f'''digraph devices {{
   memory -> cpu   [arrowsize=2];
   cpu -> memory   [arrowsize=2];
 }}'''
-# グラフを固定されたプレースホルダに描画
-graph_placeholder.graphviz_chart(source)
+
+# レイアウト: 左に図、右にステップ詳細
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    st.subheader("各装置の関係図(動作中)")
+    st.graphviz_chart(source)
+
+with col2:
+    # ステップ表示補助
+    def show_step(text):
+        st.markdown(f"<div class='step-header'>{text}</div>", unsafe_allow_html=True)
+
+    if step >= 1:
+        show_step('ステップ1: 主記憶装置にデータ／命令を格納')
+        df = pd.DataFrame.from_dict(data, orient='index', columns=['内容'])
+        df.index.name = '番地'
+        st.table(df)
+        show_status(pc=1)
+    if step >= 2:
+        show_step('ステップ2: プログラムカウンタが命令を指す')
+        show_status(pc=1)
+    if step >= 3:
+        show_step('ステップ3: 命令を読み込む')
+        inst = data['1']
+        show_status(pc=2, inst=inst)
+    if step >= 4:
+        show_step('ステップ4: 命令を解釈')
+        show_status(pc=2, inst=inst)
+    if step >= 5:
+        show_step('ステップ5: レジスタAにデータ転送')
+        regA = data['7']
+        show_status(pc=3, inst=inst, regA=regA)
+    if step >= 6:
+        show_step('ステップ6: 演算を実行')
+        regA = data['7']; regB = data['8']
+        result = regA + regB
+        show_status(pc=3, inst=inst, regA=regA, regB=regB, result=result)
+    if step >= 7:
+        show_step('ステップ7: 結果を主記憶装置に書き戻し')
+        data['9'] = result
+        show_status(pc=4, inst=data['2'], regA=regA, regB=regB, result=result)
+        st.success(f"完了: 番地9に演算結果 {result} を格納しました。")
