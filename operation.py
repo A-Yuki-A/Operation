@@ -15,20 +15,25 @@ def reset():
 # アプリタイトル
 st.title("CPU 命令実行フロー体験アプリ")
 
+# 補足説明
+st.caption("※ 'READ A' の A はレジスタA を表しています。" )
+
 # サイドバー入力
 with st.sidebar:
     st.header("入力パネル")
     A = st.number_input("値Aを入力", value=0, step=1)
     B = st.number_input("値Bを入力", value=0, step=1)
     st.write("命令セット:")
-    st.write("0x00: read A, ()")
-    st.write("0x01: ADD A, ()")
-    st.write("0x02: Write (), A")
-    st.write("0x03: stop")
+    st.write("0x00: READ A, (4)")
+    st.write("0x01: ADD A, (5)")
+    st.write("0x02: WRITE (6), A")
+    st.write("0x03: STOP")
     st.write("データ配置:")
+    st.write("0x04: B の値")
+    st.write("0x05: -- (未使用)")
     st.write("0x06: A の値")
     st.write("0x07: B の値")
-    st.write("0x08: C (結果)")
+    st.write("0x08: C (結果保存)")
     if st.button("次へ (命令実行)"):
         next_step()
     if st.button("リセット"):
@@ -55,12 +60,14 @@ if step >= 1:
     st.subheader("ステップ1: 主記憶装置にデータ／命令を格納")
     # メモリ内容をテーブルで表示（C は空に）
     mem = pd.DataFrame({
-        'アドレス': ['0x00','0x01','0x02','0x03','0x06','0x07','0x08'],
+        'アドレス': ['0x00','0x01','0x02','0x03','0x04','0x05','0x06','0x07','0x08'],
         '内容': [
-            'read A, ()',
-            'ADD A, ()',
-            'Write (), A',
-            'stop',
+            'READ A, (4)',
+            'ADD A, (5)',
+            'WRITE (6), A',
+            'STOP',
+            f'--',
+            f'--',
             f'A = {A}',
             f'B = {B}',
             ''  # C はまだ空
@@ -69,25 +76,24 @@ if step >= 1:
     st.table(mem)
 
 if step >= 2:
-
     st.subheader("ステップ2: プログラムカウンタ → 命令アドレス指示")
     st.write("PC が 0x00 を指しています。次に実行する命令です。")
 if step >= 3:
     st.subheader("ステップ3: 命令レジスタに命令を読み込み")
-    inst = 'read A, ()'
+    inst = 'READ A, (4)'
     st.write(f"IR に命令 '{inst}' が読み込まれました。")
 if step >= 4:
     st.subheader("ステップ4: 命令解読器が命令を解読")
-    st.write("命令解読器が 'read A → レジスタA にデータ取得' と解釈しました。")
+    st.write("命令解読器が 'READ A → レジスタA にアドレス4の内容を取得' と解釈しました。")
 if step >= 5:
     st.subheader("ステップ5: レジスタにデータを転送")
-    st.write(f"レジスタA ← {A}")
+    st.write(f"レジスタA ← メモリ[0x04] ({B})")
 if step >= 6:
     st.subheader("ステップ6: 演算装置 (ALU) で計算")
     result = A + B
-    st.write(f"ALU: レジスタA({A}) + レジスタB({B}) = {result}")
+    st.write(f"ALU: レジスタA({B}) + レジスタB({A}) = {result}")
 if step >= 7:
     st.subheader("ステップ7: 結果を主記憶装置に書き戻し")
-    st.write(f"主記憶 0x08: C ← {A + B}")
-    st.success(f"命令実行完了: C = {A + B}")
+    st.write(f"主記憶 0x08: C ← {result}")
+    st.success(f"命令実行完了: C = {result}")
     st.info("リセットして再度体験できます。")
