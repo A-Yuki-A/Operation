@@ -67,7 +67,7 @@ st.graphviz_chart("\n".join(dot))
 # ステップ詳細
 if step >= 1:
     st.subheader('ステップ1: 主記憶装置にデータ／命令を格納')
-        mem = pd.DataFrame({
+    mem = pd.DataFrame({
         '番地': ['0x00','0x01','0x02','0x03','0x04','0x05','0x06','0x07','0x08'],
         '内容': [
             'READ A, (6) → レジスタAに番地6のデータを読み込む',
