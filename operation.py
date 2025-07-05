@@ -63,19 +63,8 @@ def show_status(pc=None, inst=None, regA=None, regB=None, result=None):
 
 step = st.session_state.step
 
-# フローチャート表示
-labels = [
-    '1. メモリ格納', '2. PC→命令', '3. 命令読み込み',
-    '4. 解釈', '5. レジスタ転送', '6. 演算', '7. 書き戻し'
-]
-dot = ['digraph G {', '  rankdir=LR;', '  node[shape=box,fontname="Helvetica"];']
-for i, label in enumerate(labels):
-    style = 'style=filled,fillcolor="lightblue"' if i < step else ''
-    dot.append(f'  n{i} [{style} label="{label}"];')
-dot.extend([f'  n{i} -> n{i+1};' for i in range(len(labels)-1)])
-dot.append('}')
-st.subheader("命令実行フロー（フローチャート）")
-st.graphviz_chart("\n".join(dot))
+# フロー図を固定するプレースホルダ
+graph_placeholder = st.empty()
 
 # ステップ表示補助
 def show_step(text):
@@ -113,27 +102,26 @@ if step >= 7:
     show_status(pc=4, inst=data['2'], regA=regA, regB=regB, result=result)
     st.success(f"完了: 番地9に演算結果 {result} を格納しました。")
 
-# 各装置の関係図 (動作中)
-st.subheader("各装置の関係図 (動作中)")
-# メモリ内容を改行付きHTMLで表示
+# 各装置の関係図を描画（固定）
+# メモリ内容
 mem_labels = "\n".join([f"番地{addr}: {data[addr]}" for addr in sorted(data.keys(), key=int)])
-mem_html   = mem_labels.replace("\n", "<BR/>")
+mem_html = mem_labels.replace("\n", "<BR/>")
 # CPU状態
 pc_val  = step if step > 0 else 1
-regA_val = data['7']
-regB_val = data['8']
-res_val  = data['9'] if data['9'] != '' else (regA_val+regB_val if step >= 6 else '')
-# アクティブ装置判定
+regA_val = data['7']; regB_val = data['8']
+res_val  = data['9'] if data['9'] != '' else (regA_val + regB_val if step >= 6 else '')
+# アクティブ装置
 active = 'memory' if step in (1,7) else 'cpu' if 2 <= step <= 6 else None
-color_mem = "#FFEEBA" if active == 'memory' else "black"
-color_cpu = "#A3E4A1" if active == 'cpu' else "black"
-cpu_label = f"PC={pc_val}<BR/>A={regA_val}<BR/>B={regB_val}<BR/>結果={res_val}"
-# Graphvizソース
+color_mem = "#FFEEBA" if active == 'memory' else "#FFF3CD"
+color_cpu = "#A3E4A1" if active == 'cpu' else "#D4EDDA"
+# CPUラベルHTML
+cpu_html = f"PC={pc_val}<BR/>A={regA_val}<BR/>B={regB_val}<BR/>結果={res_val}"
+# Graphvizソース (レイアウト固定)
 source = f'''digraph devices {{
   graph [nodesep=1.0, ranksep=1.0];
-  node [shape=box, style=filled, fontname="Helvetica", fontsize=24];
-  memory [label=<{mem_html}>, fillcolor="#FFF3CD", color="{color_mem}"];
-  cpu    [label=<{cpu_label}>, fillcolor="#D4EDDA", color="{color_cpu}"];
+  node [shape=box, style=filled, fontname="Helvetica", fontsize=24, width=2, height=1];
+  memory [label=<{mem_html}>, fillcolor="{color_mem}", color="black"];
+  cpu    [label=<{cpu_html}>, fillcolor="{color_cpu}", color="black"];
   keyboard [label="キーボード", fillcolor="#F8D7DA", color="black"];
   display  [label="ディスプレイ", fillcolor="#D1ECF1", color="black"];
   keyboard -> cpu [arrowsize=2];
@@ -141,4 +129,5 @@ source = f'''digraph devices {{
   memory -> cpu   [arrowsize=2];
   cpu -> memory   [arrowsize=2];
 }}'''
-st.graphviz_chart(source)
+# グラフを固定されたプレースホルダに描画
+graph_placeholder.graphviz_chart(source)
