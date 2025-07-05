@@ -107,7 +107,8 @@ if step >= 7:
 # 各装置の関係図: メモリとCPUダイナミック表示
 st.subheader("各装置の関係図(動作中)")
 # 動的メモリ内容
-mem_labels = "\n".join([f"番地{addr}: {memory[addr]}" for addr in sorted(memory.keys(), key=int)])
+mem_labels = "
+".join([f"番地{addr}: {memory[addr]}" for addr in sorted(memory.keys(), key=int)])
 # CPU内部状態
 regA_val = memory['7']
 regB_val = memory['8']
@@ -122,19 +123,19 @@ digraph devices {{
   node [shape=box, style=filled, fontname="Helvetica", fontsize=24, width=2, height=1];
 
   memory [label="主記憶装置
-{mem_labels}", fillcolor="#FFF3CD", color={'#FFEEBA' if active=='memory' else 'black'}];
+{mem_labels}", fillcolor="#FFF3CD", color="{'#FFEEBA' if active=='memory' else 'black'}"];
   cpu    [label="CPU
 PC={pc_val}
 A={regA_val} B={regB_val}
-結果={res_val}", fillcolor="#D4EDDA", color={'#A3E4A1' if active=='cpu' else 'black'}];
-  keyboard [label="キーボード", fillcolor="#F8D7DA", color='black'];
-  display  [label="ディスプレイ", fillcolor="#D1ECF1", color='black'];
+結果={res_val}", fillcolor="#D4EDDA", color="{'#A3E4A1' if active=='cpu' else 'black'}"];
+  keyboard [label="キーボード", fillcolor="#F8D7DA", color="black"];
+  display  [label="ディスプレイ", fillcolor="#D1ECF1", color="black"];
 
   keyboard -> cpu [arrowsize=2];
   cpu -> display  [arrowsize=2];
   memory -> cpu   [arrowsize=2];
   cpu -> memory   [arrowsize=2];
-}  
+}}
 """
 # 図を表示
 st.graphviz_chart(dot2)
