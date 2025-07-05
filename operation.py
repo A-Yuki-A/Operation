@@ -32,7 +32,8 @@ with st.sidebar:
     A = st.number_input("値Aを入力 (番地7 に格納)", value=0)
     B = st.number_input("値Bを入力 (番地8 に格納)", value=0)
     pc_sidebar = st.session_state.step if st.session_state.step > 0 else 1
-    st.write(f"プログラムカウンタ (PC): 番地{pc_sidebar}")
+    # プログラムカウンタの大きい数字表示
+    st.markdown(f"**プログラムカウンタ :** <span style='font-size:32px'>{pc_sidebar}</span>", unsafe_allow_html=True)
     st.button("次へ (命令実行)", on_click=next_step)
     st.button("リセット", on_click=reset)
 
@@ -63,25 +64,21 @@ def show_status(pc=None, inst=None, regA=None, regB=None, result=None):
 
 step = st.session_state.step
 
-# レイアウト：左に図、右にステップ詳細
+# レイアウト：左に関係図、右にステップ詳細
 col1, col2 = st.columns([2, 1])
 
-# 左カラム：各装置の関係図（固定）
+# 左カラム：各装置の関係図（固定描画）
 with col1:
     st.subheader("各装置の関係図 (動作中)")
-    # メモリ内容HTML
     mem_labels = "\n".join([f"番地{addr}: {data[addr]}" for addr in sorted(data.keys(), key=int)])
     mem_html = mem_labels.replace("\n", "<BR/>")
-    # CPU状態
     pc_val   = step if step > 0 else 1
     regA_val = data['7']; regB_val = data['8']
     res_val  = data['9'] if data['9'] != '' else (regA_val + regB_val if step >= 6 else '')
-    # アクティブ装置判定
     active   = 'memory' if step in (1,7) else 'cpu' if 2 <= step <= 6 else None
     color_mem = "#FFEEBA" if active == 'memory' else "#FFF3CD"
     color_cpu = "#A3E4A1" if active == 'cpu' else "#D4EDDA"
     cpu_html = f"PC={pc_val}<BR/>A={regA_val}<BR/>B={regB_val}<BR/>結果={res_val}"
-    # Graphvizソース（フォントサイズ大きく）
     source = f'''digraph devices {{
       graph [nodesep=1.5, ranksep=2.0];
       node [shape=box, style=filled, fontname="Arial", width=4, height=2, penwidth=2];
