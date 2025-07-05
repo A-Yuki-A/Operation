@@ -25,9 +25,9 @@ with st.sidebar:
     B = st.number_input("値Bを入力", value=0, step=1)
     st.write("命令セット (番地と説明)")
     commands = [
-        ("0x00: READ A, (4)", "レジスタAに番地4のデータを読み込む"),
-        ("0x01: ADD A, (5)", "レジスタAの値に番地5のデータを加算する"),
-        ("0x02: WRITE (6), A", "レジスタAの値を番地6に書き戻す"),
+        ("0x00: READ A, (6)", "レジスタAに番地6のデータを読み込む"),
+        ("0x01: ADD A, (7)", "レジスタAの値に番地7のデータを加算する"),
+        ("0x02: WRITE (8), A", "レジスタAの値を番地8に書き戻す"),
         ("0x03: STOP", "プログラムの実行を停止する")
     ]
     for code, desc in commands:
@@ -36,8 +36,8 @@ with st.sidebar:
     data_layout = [
         ("0x04", "--"),
         ("0x05", "--"),
-        ("0x06", f"A = {A}"),
-        ("0x07", f"B = {B}"),
+        ("0x06", f"A = {A}"),  # A の値を格納
+        ("0x07", f"B = {B}"),  # B の値を格納
         ("0x08", "C (結果保存)")
     ]
     for addr, val in data_layout:
@@ -70,15 +70,15 @@ if step >= 1:
     mem = pd.DataFrame({
         '番地': list(range(1,10)),
         '内容': [
-            'READ A, (4) → レジスタAに番地4のデータを読み込む',
-            'ADD A, (5) → レジスタAに番地5のデータを加算する',
-            'WRITE (6), A → レジスタAの値を番地6に書き戻す',
+            'READ A, (6) → レジスタAに番地6のデータを読み込む',
+            'ADD A, (7) → レジスタAに番地7のデータを加算する',
+            'WRITE (8), A → レジスタAの値を番地8に書き戻す',
             'STOP → プログラム停止',
             '--',
             '--',
-            f'A = {A}',
-            f'B = {B}',
-            ''
+            f'A = {A}',  # 番地6
+            f'B = {B}',  # 番地7
+            ''  # 番地8: C は未登録
         ]
     })
     st.table(mem)
@@ -87,17 +87,17 @@ if step >= 2:
     st.write('PC が 番地1 を指しています。次に実行する命令です。')
 if step >= 3:
     st.subheader("ステップ3: 命令レジスタに命令を読み込み")
-    inst = 'READ A, (4)'
+    inst = 'READ A, (6)'  # アドレス6から読み込み'
     st.write(f"IR に命令 '{inst}' が読み込まれました。")
 if step >= 4:
     st.subheader("ステップ4: 命令解読器が命令を解読")
-    st.write("命令解読器が 'READ A → レジスタA に番地4の内容を取得' と解釈しました。")
+    st.write("命令解読器が 'READ A → レジスタA に番地6の内容を取得' と解釈しました。")
 if step >= 5:
     st.subheader("ステップ5: レジスタにデータを転送")
-    st.write(f"レジスタA ← メモリ[0x04] ({B})")
+    st.write(f"レジスタA ← メモリ[0x06] ({A})  # 番地6 を読み込み")
 if step >= 6:
     st.subheader("ステップ6: 演算装置 (ALU) で計算")
-    result = A + B
+    result = A + B  # 演算結果
     st.write(f"ALU: レジスタA({B}) + レジスタB({A}) = {result}")
 if step >= 7:
     st.subheader("ステップ7: 結果を主記憶装置に書き戻し")
