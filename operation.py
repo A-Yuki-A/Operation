@@ -5,85 +5,77 @@ import pandas as pd
 if 'step' not in st.session_state:
     st.session_state.step = 0
 
-# ステップを進める関数
+# ステップ操作
 def next_step():
     st.session_state.step += 1
 
-# リセット関数
 def reset():
     st.session_state.step = 0
 
 # アプリタイトル
 st.title("CPU 命令実行フロー体験アプリ")
 
-# サイドバーで入力
+# サイドバー入力
 with st.sidebar:
     st.header("入力パネル")
     A = st.number_input("値Aを入力", value=0, step=1)
     B = st.number_input("値Bを入力", value=0, step=1)
-    st.write("命令: A + B の合計をCに保存")
-    st.write("命令セット: read A, () → ADD A, () → Write (), A → stop")
+    st.write("命令セット:")
+    st.write("0x00: read A, ()")
+    st.write("0x01: ADD A, ()")
+    st.write("0x02: Write (), A")
+    st.write("0x03: stop")
+    st.write("データ配置:")
+    st.write("0x06: A の値")
+    st.write("0x07: B の値")
+    st.write("0x08: C (結果)")
     if st.button("次へ (命令実行)"):
         next_step()
     if st.button("リセット"):
         reset()
 
-# ステップ管理
-dot_src = None
+# ステップ数取得
 step = st.session_state.step
-step_labels = [
-    '1. 主記憶: データ/命令格納',
-    '2. PCが命令アドレスを指す',
-    '3. IRに命令読み込み',
-    '4. 命令解読',
-    '5. レジスタ転送',
-    '6. ALUで計算',
-    '7. 結果書き戻し'
-]
-# DOT生成
-dot_lines = ['digraph G {', '  rankdir=LR;', '  node [shape=box, fontname="Helvetica"];']
-for idx, label in enumerate(step_labels):
-    attrs = []
-    if idx < step:
-        attrs.append('style=filled')
-        attrs.append('fillcolor="lightblue"')
-    attr_str = '[' + ','.join(attrs) + ']' if attrs else ''
-    dot_lines.append(f'  node{idx} {attr_str} label="{label}";')
-for idx in range(len(step_labels) - 1):
-    dot_lines.append(f'  node{idx} -> node{idx+1};')
-dot_lines.append('}')
-dot_src = "\n".join(dot_lines)
+
+# フローチャート DOT
+labels = ['1. メモリ格納','2. PC→命令','3. IR読み込み','4. 解読','5. レジスタ転送','6. 計算','7. 書き戻し']
+dot = ['digraph G {','  rankdir=LR;','  node [shape=box,fontname="Helvetica"];']
+for i,l in enumerate(labels):
+    style = 'style=filled,fillcolor="lightblue"' if i < step else ''
+    dot.append(f'  n{i} [{style} label="{l}"];')
+for i in range(len(labels)-1): dot.append(f'  n{i} -> n{i+1};')
+dot.append('}')
 
 # フローチャート表示
 st.subheader("命令実行フロー（フローチャート）")
-st.graphviz_chart(dot_src)
+st.graphviz_chart("\n".join(dot))
 
-# ステップ詳細表示
+# ステップ詳細
 if step >= 1:
     st.subheader("ステップ1: 主記憶装置にデータ／命令を格納")
     mem = pd.DataFrame({
-        'アドレス': ['0x00', '0x01', '0x02', '0x03', '0x04', '0x05'],
+        'アドレス': ['0x00','0x01','0x02','0x03','0x06','0x07','0x08'],
         '内容': [
-            f'A = {A}',
-            f'B = {B}',
             'read A, ()',
             'ADD A, ()',
             'Write (), A',
-            'stop'
+            'stop',
+            f'A = {A}',
+            f'B = {B}',
+            'C (結果保存)'
         ]
     })
     st.table(mem)
 if step >= 2:
     st.subheader("ステップ2: プログラムカウンタ → 命令アドレス指示")
-    st.write("PC が 0x02 を指しています。次に実行する 'read A, ()' コードの位置です。")
+    st.write("PC が 0x00 を指しています。次に実行する命令です。")
 if step >= 3:
     st.subheader("ステップ3: 命令レジスタに命令を読み込み")
-    # 読み込む命令をメモリから取得
-    inst = ['read A, ()', 'ADD A, ()', 'Write (), A', 'stop'][0]
+    inst = 'read A, ()'
     st.write(f"IR に命令 '{inst}' が読み込まれました。")
 if step >= 4:
     st.subheader("ステップ4: 命令解読器が命令を解読")
-    st.write("命令解読器が 'read A → レジスタAにデータを取得' と解釈しました。")
+    st.write("命令解読器が 'read A → レジスタA にデータ取得' と解釈しました。")
 if step >= 5:
     st.subheader("ステップ5: レジスタにデータを転送")
     st.write(f"レジスタA ← {A}")
@@ -93,6 +85,6 @@ if step >= 6:
     st.write(f"ALU: レジスタA({A}) + レジスタB({B}) = {result}")
 if step >= 7:
     st.subheader("ステップ7: 結果を主記憶装置に書き戻し")
-    st.write(f"主記憶: C ← {A + B}")
+    st.write(f"主記憶 0x08: C ← {A + B}")
     st.success(f"命令実行完了: C = {A + B}")
-    st.info("リセットして、再度体験できます。")
+    st.info("リセットして再度体験できます。")
