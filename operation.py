@@ -27,12 +27,16 @@ st.title("CPU 命令実行フロー体験アプリ")
 st.caption("※ 'READ A' の A はレジスタA を表しています。")
 
 # サイドバー: 入力パネルとPC表示
+import math
 with st.sidebar:
     st.header("入力パネル")
     A = st.number_input("値Aを入力 (番地7 に格納)", value=0)
     B = st.number_input("値Bを入力 (番地8 に格納)", value=0)
-    pc_sidebar = st.session_state.step if st.session_state.step > 0 else 1
-    # プログラムカウンタの大きい数字表示
+    # プログラムカウンタ: 命令フェッチごとにインクリメント (実際のCPUのように)
+    if st.session_state.step < 3:
+        pc_sidebar = 1
+    else:
+        pc_sidebar = math.ceil((st.session_state.step - 1) / 2)
     st.markdown(f"**プログラムカウンタ :** <span style='font-size:32px'>{pc_sidebar}</span>", unsafe_allow_html=True)
     st.button("次へ (命令実行)", on_click=next_step)
     st.button("リセット", on_click=reset)
