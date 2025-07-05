@@ -138,6 +138,6 @@ digraph devices {{
   cpu -> display  [arrowsize=2];
   memory -> cpu   [arrowsize=2];
   cpu -> memory   [arrowsize=2];
-}}
-"""
+}}"""
+# 図を表示
 st.graphviz_chart(dot2)
