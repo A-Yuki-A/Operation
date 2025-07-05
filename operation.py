@@ -49,11 +49,11 @@ memory = {
 # ステータス表示
 def show_status(pc=None, inst=None, regA=None, regB=None, result=None):
     st.markdown("<div class='status-box'>", unsafe_allow_html=True)
-    if pc:    st.write(f"**PC**: 番地{pc}")
-    if inst:  st.write(f"**命令**: {inst}")
-    if regA is not None: st.write(f"**レジスタA**: {regA}")
-    if regB is not None: st.write(f"**レジスタB**: {regB}")
-    if result is not None: st.write(f"**演算結果**: {result}")
+    if pc is not None:    st.write(f"**PC**: 番地{pc}")
+    if inst:              st.write(f"**命令**: {inst}")
+    if regA is not None:  st.write(f"**レジスタA**: {regA}")
+    if regB is not None:  st.write(f"**レジスタB**: {regB}")
+    if result is not None:st.write(f"**演算結果**: {result}")
     st.markdown("</div>", unsafe_allow_html=True)
 
 step = st.session_state.step
@@ -107,25 +107,30 @@ if step >= 7:
 # 各装置の関係図: メモリとCPUダイナミック表示
 st.subheader("各装置の関係図(動作中)")
 # 動的メモリ内容
-mem_labels = "|".join([f"{addr}:{memory[addr]}" for addr in memory])
+mem_labels = "|".join([f"{addr}:{memory[addr]}" for addr in sorted(memory.keys(), key=int)])
 # CPU内部状態
 regA_val = memory['7']
 regB_val = memory['8']
 res_val = memory['9'] if memory['9'] != '' else (regA_val+regB_val if step>=6 else '')
+# アクティブ装置判定
+active = 'memory' if step in (1,7) else 'cpu' if 2 <= step <=6 else None
+mem_style = 'style=filled,fillcolor="lightblue"' if active=='memory' else ''
+cpu_style = 'style=filled,fillcolor="lightblue"' if active=='cpu' else ''
+# CPUラベル
 cpu_label = f"{{CPU|PC={pc_val}|A={regA_val}|B={regB_val}|ALU={res_val}}}"
 # Graphvizソース
-dot2 = f"""
-digraph devices {{
-  rankdir=LR;
-  node[shape=record,fontname=Helvetica];
-  memory [label="{{主記憶装置|{mem_labels}}}"];
-  cpu    [label="{cpu_label}"];
-  keyboard [label="キーボード",shape=box];
-  display  [label="ディスプレイ",shape=box];
-  keyboard -> cpu;
-  cpu -> display;
-  memory -> cpu;
-  cpu -> memory;
-}}
-"""
-st.graphviz_chart(dot2)
+dot2 = [
+    'digraph devices {',
+    '  rankdir=LR;',
+    '  node[shape=record,fontname="Helvetica",fontsize=20];',
+    f'  memory [{mem_style} label="{{主記憶装置|{mem_labels}}}"];',
+    f'  cpu    [{cpu_style} label="{cpu_label}"];',
+    '  keyboard [label="キーボード",shape=box,fontsize=20];',
+    '  display  [label="ディスプレイ",shape=box,fontsize=20];',
+    '  keyboard -> cpu;',
+    '  cpu -> display;',
+    '  memory -> cpu;',
+    '  cpu -> memory;',
+    '}'
+]
+st.graphviz_chart("\n".join(dot2))
