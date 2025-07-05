@@ -79,7 +79,7 @@ cpu_html = f"PC={pc_val}<BR/>A={regA_val}<BR/>B={regB_val}<BR/>結果={res_val}"
 # Graphvizソース
 source = f'''digraph devices {{
   graph [nodesep=1.0, ranksep=1.0];
-  node [shape=box, style=filled, fontname="Helvetica", fontsize=24, width=2, height=1];
+  node [shape=box, style=filled, fontname="Helvetica", fontsize=32, width=3, height=2, penwidth=2];
   memory [label=<{mem_html}>, fillcolor="{color_mem}", color="black"];
   cpu    [label=<{cpu_html}>, fillcolor="{color_cpu}", color="black"];
   keyboard [label="キーボード", fillcolor="#F8D7DA", color="black"];
