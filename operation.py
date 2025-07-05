@@ -77,7 +77,7 @@ if step >= 1:
 
 if step >= 2:
     st.subheader('ステップ2: プログラムカウンタ → 命令番地指示')
-    st.write('PC が 番地1 を指しています。次に実行する命令です。')")
+    st.write('PC が 番地1 を指しています。次に実行する命令です。'))
 if step >= 3:
     st.subheader("ステップ3: 命令レジスタに命令を読み込み")
     inst = 'READ A, (4)'
