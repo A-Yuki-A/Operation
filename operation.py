@@ -67,8 +67,8 @@ st.graphviz_chart("\n".join(dot))
 # ステップ詳細
 if step >= 1:
     st.subheader('ステップ1: 主記憶装置にデータ／命令を格納')
-    mem = pd.DataFrame({
-        '番地': list(range(1,10)),
+        mem = pd.DataFrame({
+        '番地': ['0x00','0x01','0x02','0x03','0x04','0x05','0x06','0x07','0x08'],
         '内容': [
             'READ A, (6) → レジスタAに番地6のデータを読み込む',
             'ADD A, (7) → レジスタAに番地7のデータを加算する',
@@ -81,6 +81,8 @@ if step >= 1:
             ''  # 番地8: C は未登録
         ]
     })
+    # 番地をインデックスに設定して連番を非表示
+    mem = mem.set_index('番地')
     st.table(mem)
 if step >= 2:
     st.subheader('ステップ2: プログラムカウンタ → 命令番地指示')
