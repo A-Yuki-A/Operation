@@ -83,22 +83,19 @@ with col1:
     color_mem = "#FFEEBA" if active == 'memory' else "#FFF3CD"
     color_cpu = "#A3E4A1" if active == 'cpu' else "#D4EDDA"
     cpu_html = f"PC={pc_val}<BR/>A={regA_val}<BR/>B={regB_val}<BR/>結果={res_val}"
-    source = f'''digraph devices {{
+    source = f'''digraph devices {
       graph [nodesep=1.5, ranksep=2.0];
-      node [shape=box, style=filled, fontname="Arial", width=4, height=2, penwidth=2];
-      memory [label=<<FONT POINT-SIZE=\"15\" ALIGN=\"LEFT\">{mem_html}</FONT>>,
-              fillcolor="{color_mem}", color="black"];
-      cpu    [label=<<FONT POINT-SIZE=\"11\">{cpu_html}</FONT>>,
-              fillcolor="{color_cpu}", color="black"];
-      keyboard [label=<<FONT POINT-SIZE=\"11\">キーボード</FONT>>,
-                fillcolor="#F8D7DA", color="black"];
-      display  [label=<<FONT POINT-SIZE=\"11\">ディスプレイ</FONT>>,
-                fillcolor="#D1ECF1", color="black"];
+      node [shape=box, style=filled, fontname="Arial", fontsize=20, labeljust="l", width=4, height=2, penwidth=2];
+      memory [label="{mem_html}", fillcolor="{color_mem}", color="black"];
+      cpu    [label="{cpu_html}", fillcolor="{color_cpu}", color="black"];
+      keyboard [label="キーボード", fillcolor="#F8D7DA", color="black"];
+      display  [label="ディスプレイ", fillcolor="#D1ECF1", color="black"];
       keyboard -> cpu [arrowsize=3];
       cpu -> display  [arrowsize=3];
       memory -> cpu   [arrowsize=3];
       cpu -> memory   [arrowsize=3];
-    }}'''
+}}'''
+
     st.graphviz_chart(source)
 
 # 右カラム：ステップ詳細表示
