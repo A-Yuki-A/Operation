@@ -106,10 +106,10 @@ with col1:
                 fillcolor="#F8D7DA", color="black"];
       display  [label=<<TABLE BORDER="0"><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="20">ディスプレイ</FONT></TD></TR></TABLE>>,
                 fillcolor="#D1ECF1", color="black"];
-      keyboard -> cpu [arrowsize=3];
-      cpu -> display  [arrowsize=3];
-      memory -> cpu   [arrowsize=3];
-      cpu -> memory   [arrowsize=3];
+      keyboard -> cpu [arrowsize=3, len=0.5];
+      cpu -> display [arrowsize=3, len=0.5];
+      memory -> cpu [arrowsize=3, len=0.5];
+      cpu -> memory [arrowsize=3, len=0.5];
     }}'''
     st.graphviz_chart(graph_viz)
 
