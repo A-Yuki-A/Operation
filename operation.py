@@ -75,16 +75,19 @@ desc = ''
 if not st.session_state.running:
     desc = 'プログラムは停止しています。'
 elif st.session_state.active == 'cu':
-    desc = '制御装置が次の命令をフェッチ（取得）しています。'
+    addr = st.session_state.pc
+    desc = f'制御装置がアドレス{addr}にある命令をフェッチ（取得）しています。'
 elif st.session_state.active == 'alu':
-    desc = '演算装置がレジスタAとBのデータを使って加算を実行しています。'
+    desc = f'演算装置が命令{inst}に従い、レジスタAとBのデータを使って加算を実行しています。'
 elif st.session_state.active == 'mem':
     if inst.startswith('READ'):
-        reg_addr = inst.split()[1]
-        desc = f'主記憶装置から {reg_addr} のデータを読み込んでいます。'
+        reg, mem_addr = inst.split()[1].split(',')
+        fetch_addr = st.session_state.pc - 1
+        desc = f'主記憶装置からアドレス{fetch_addr}にある命令から{reg},{mem_addr} のデータを読み込んでいます。'
     elif inst.startswith('WRITE'):
-        reg = inst.split()[1].split(',')[1]
-        desc = f'レジスタ {reg} の結果を主記憶装置に書き込んでいます。'
+        parts = inst.split()[1].split(',')
+        fetch_addr = st.session_state.pc - 1
+        desc = f'主記憶装置からアドレス{fetch_addr}にある命令から{parts[0]},{parts[1]} の命令に従い、レジスタ{parts[1]} の結果を保存しています。'
     else:
         desc = '主記憶装置でデータの読み書きを行っています。'
 st.info(desc)
