@@ -74,11 +74,10 @@ col1, col2 = st.columns([2, 1])
 # 左カラム：各装置の関係図（固定描画）
 with col1:
     st.subheader("各装置の関係図 (動作中)")
+    import math
     # メモリ内容を改行で結合
     mem_labels = "
 ".join([f"番地{addr}: {data[addr]}" for addr in sorted(data.keys(), key=int)])
-    mem_html = mem_labels.replace("
-", "<BR/>"), key=int)])
     mem_html = mem_labels.replace("
 ", "<BR/>")
     # プログラムカウンタ計算
@@ -99,13 +98,13 @@ with col1:
     graph_viz = f'''digraph devices {{
       graph [nodesep=1.5, ranksep=2.0];
       node [shape=box, style=filled, fontname="Arial", width=4, height=2, penwidth=2];
-      memory [label=<<TABLE BORDER='0' CELLBORDER='0' CELLSPACING='0'><TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>{mem_html}</FONT></TD></TR></TABLE>>,
+      memory [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="20">{mem_html}</FONT></TD></TR></TABLE>>,
               fillcolor="{color_mem}", color="black"];
-      cpu    [label=<<TABLE BORDER='0' CELLBORDER='0' CELLSPACING='0'><TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>{cpu_html}</FONT></TD></TR></TABLE>>,
+      cpu    [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="20">{cpu_html}</FONT></TD></TR></TABLE>>,
               fillcolor="{color_cpu}", color="black"];
-      keyboard [label=<<TABLE BORDER='0'><TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>キーボード</FONT></TD></TR></TABLE>>,
+      keyboard [label=<<TABLE BORDER="0"><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="20">キーボード</FONT></TD></TR></TABLE>>,
                 fillcolor="#F8D7DA", color="black"];
-      display  [label=<<TABLE BORDER='0'><TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>ディスプレイ</FONT></TD></TR></TABLE>>,
+      display  [label=<<TABLE BORDER="0"><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="20">ディスプレイ</FONT></TD></TR></TABLE>>,
                 fillcolor="#D1ECF1", color="black"];
       keyboard -> cpu [arrowsize=3];
       cpu -> display  [arrowsize=3];
