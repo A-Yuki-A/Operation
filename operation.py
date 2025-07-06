@@ -10,9 +10,9 @@ def show_definitions():
         '命令レジスタ (IR)': '主記憶装置から読み出した命令を一時的に保持するレジスタ',
         '主記憶装置': '命令やデータを格納しておく記憶領域',
         '演算装置': 'データの計算（加減乗除）を行う装置',
-        '命令': 'CPUに対して何をするか指示するコード。例として READ A,100 の A はレジスタA、100 は主記憶装置の番地です。',
+        '命令': 'CPUに対して何をするか指示するコード。例: READ A,100 のAはレジスタA、100は主記憶装置の番地',
         'データ': '命令が扱う数値や文字などの情報',
-        'レジスタ A, B, C': 'CPU内部の高速にアクセスできる小さな記憶領域で、主記憶装置から読み込んだデータを一時的に保持します。'
+        'レジスタ A, B, C': 'CPU内部の高速な小さな記憶領域で、主記憶装置からのデータを一時的に保持'
     }
     for term, desc in defs.items():
         st.write(f'**{term}**: {desc}')
@@ -38,13 +38,13 @@ def init_state():
         'active': None,
         'history': [],
     }
-    for key, val in defaults.items():
-        if key not in st.session_state:
-            st.session_state[key] = copy.deepcopy(val)
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = copy.deepcopy(v)
     if not st.session_state.history:
         st.session_state.history.append(snapshot_state())
 
-# --- スナップショット作成 ---
+# --- スナップショット ---
 def snapshot_state():
     return {
         'step': st.session_state.step,
@@ -56,16 +56,15 @@ def snapshot_state():
         'active': st.session_state.active,
     }
 
-# 初期化
+# 初期化呼び出し
 init_state()
 
 # リセットボタン
 if st.button('🔄 リセット'):
     st.session_state.clear()
     init_state()
-    st.experimental_rerun()
 
-# タイトルと用語説明
+# タイトル・用語説明
 st.title('CPU 動作可視化デモ')
 with st.expander('📖 用語説明を開く'):
     show_definitions()
@@ -116,18 +115,17 @@ with col2:
         elif inst and inst.startswith('WRITE'):
             st.session_state.active = 'mem'
             parts = inst.split()[1].split(',')
-            mem_addr, reg = int(parts[0]), parts[1]
-            st.session_state.memory[mem_addr] = st.session_state.registers[reg]
+            st.session_state.memory[int(parts[0])] = st.session_state.registers[parts[1]]
         elif inst == 'STOP':
             st.session_state.active = 'cu'
             st.session_state.running = False
         st.session_state.step += 1
         st.session_state.history.append(snapshot_state())
 
-# 表示用スタイル
-def styled_container(content_fn, unit_key):
-    color = '#fffae6' if st.session_state.active == unit_key else '#f8f9fa'
-    border = '3px solid #ff9900' if st.session_state.active == unit_key else '1px solid #ddd'
+# 装置表示スタイル
+def styled_container(content_fn, unit):
+    color = '#fffae6' if st.session_state.active == unit else '#f8f9fa'
+    border = '3px solid #ff9900' if st.session_state.active == unit else '1px solid #ddd'
     st.markdown(f"<div style='padding:10px; background-color:{color}; border:{border}; border-radius:5px;'>", unsafe_allow_html=True)
     content_fn()
     st.markdown("</div>", unsafe_allow_html=True)
@@ -138,8 +136,8 @@ with cu_col:
     styled_container(lambda: (
         st.subheader('制御装置'),
         st.write(f"ステップ: {st.session_state.step}"),
-        st.write(f"プログラムカウンタ (PC): {st.session_state.pc}"),
-        st.write(f"命令レジスタ (IR): {st.session_state.ir}")
+        st.write(f"PC: {st.session_state.pc}"),
+        st.write(f"IR: {st.session_state.ir}")
     ), 'cu')
 with alu_col:
     styled_container(lambda: (
@@ -152,11 +150,10 @@ with mem_col:
     styled_container(lambda: (
         st.subheader('主記憶装置'),
         st.table(pd.DataFrame([
-            {'アドレス': addr, '内容': st.session_state.memory[addr]}
-            for addr in sorted(st.session_state.memory.keys())
+            {'アドレス': addr, '内容': st.session_state.memory[addr]} for addr in sorted(st.session_state.memory)
         ]))
     ), 'mem')
 
 # プログラム終了メッセージ
 if not st.session_state.running:
-    st.success('プログラムが終了しました。アドレス102に結果が保存されています。')
+    st.success('終了: アドレス102に結果(8)が保存されました。')
