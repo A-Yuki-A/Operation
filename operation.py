@@ -83,7 +83,7 @@ elif st.session_state.active == 'mem':
     if inst.startswith('READ'):
         reg, mem_addr = inst.split()[1].split(',')
         fetch_addr = st.session_state.pc - 1
-        desc = f'主記憶装置からアドレス{fetch_addr}にある命令から{reg},{mem_addr} のデータを読み込んでいます。'
+        desc = f'主記憶装置からアドレス{fetch_addr}にある命令から{reg},{mem_addr} のデータを読み込み、レジスタ{reg}に格納しています。'
     elif inst.startswith('WRITE'):
         parts = inst.split()[1].split(',')
         fetch_addr = st.session_state.pc - 1
