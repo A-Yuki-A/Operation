@@ -102,18 +102,27 @@ with col1:
     digraph cpu_flow {{
       rankdir=LR;
       graph [pad=0.5];
-      subgraph cluster_ctrl {{
+      subgraph cluster_ctrl {
         label="制御装置"; style=filled; fillcolor="#eeeeee";
+        rankdir=TB;
         node [shape=box, fontsize=16, fontname="Arial"];
         PC [label="プログラムカウンタ: {pc}"];
         IR [label="命令レジスタ: {data['1']}"];
         Decoder [label="命令解読器"];
         Clock [label="クロックジェネレータ"];
+      }"];
+        IR [label="命令レジスタ: {data['1']}"];
+        Decoder [label="命令解読器"];
+        Clock [label="クロックジェネレータ"];
       }}
-      subgraph cluster_alu {{
+      subgraph cluster_alu {
         label="演算装置"; style=filled; fillcolor="#ccf0ff";
+        rankdir=TB;
         node [shape=box, fontsize=16, fontname="Arial"];
         RegA [label="レジスタA: {regA}"];
+        RegB [label="レジスタB: {regB}"];
+        ALU  [label="算術論理演算装置"];
+      }"];
         RegB [label="レジスタB: {regB}"];
         ALU  [label="算術論理演算装置"];
       }}
