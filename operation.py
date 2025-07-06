@@ -86,13 +86,13 @@ with col1:
     source = f'''digraph devices {{
       graph [nodesep=1.5, ranksep=2.0];
       node [shape=box, style=filled, fontname="Arial", width=4, height=2, penwidth=2];
-      memory [label=<<FONT POINT-SIZE="36">{mem_html}</FONT>>,
+      memory [label=<<FONT POINT-SIZE=\"11\">{mem_html}</FONT>>,
               fillcolor="{color_mem}", color="black"];
-      cpu    [label=<<FONT POINT-SIZE="36">{cpu_html}</FONT>>,
+      cpu    [label=<<FONT POINT-SIZE=\"11\">{cpu_html}</FONT>>,
               fillcolor="{color_cpu}", color="black"];
-      keyboard [label=<<FONT POINT-SIZE="36">キーボード</FONT>>,
+      keyboard [label=<<FONT POINT-SIZE=\"11\">キーボード</FONT>>,
                 fillcolor="#F8D7DA", color="black"];
-      display  [label=<<FONT POINT-SIZE="36">ディスプレイ</FONT>>,
+      display  [label=<<FONT POINT-SIZE=\"11\">ディスプレイ</FONT>>,
                 fillcolor="#D1ECF1", color="black"];
       keyboard -> cpu [arrowsize=3];
       cpu -> display  [arrowsize=3];
