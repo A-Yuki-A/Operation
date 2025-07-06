@@ -78,6 +78,8 @@ with col1:
     mem_labels = "
 ".join([f"番地{addr}: {data[addr]}" for addr in sorted(data.keys(), key=int)])
     mem_html = mem_labels.replace("
+", "<BR/>"), key=int)])
+    mem_html = mem_labels.replace("
 ", "<BR/>")
     # プログラムカウンタ計算
     if step < 3:
