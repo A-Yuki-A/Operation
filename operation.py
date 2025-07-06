@@ -95,37 +95,26 @@ with col1:
     color_mem = '#FFEEBA' if active=='memory' else '#FFF3CD'
     color_cpu = '#A3E4A1' if active=='cpu' else '#D4EDDA'
     cpu_html = f"PC={pc}<BR/>A={regA}<BR/>B={regB}<BR/>結果={result}"
-    # Graphviz
-    graph_viz = f"""
-digraph devices {{
-  graph [nodesep=1.5, ranksep=2.0];
-  node [shape=box, style=filled, fontsize=20, width=4, height=2, penwidth=2];
-  memory [label=<
-    <TABLE BORDER='0' CELLBORDER='0' CELLSPACING='0'>
-      <TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>{mem_html}</FONT></TD></TR>
-    </TABLE>
-  >, fillcolor='{color_mem}', color='black'];
-  cpu    [label=<
-    <TABLE BORDER='0' CELLBORDER='0' CELLSPACING='0'>
-      <TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>{cpu_html}</FONT></TD></TR>
-    </TABLE>
-  >, fillcolor='{color_cpu}', color='black'];
-  keyboard [label=<
-    <TABLE BORDER='0'>
-      <TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>キーボード</FONT></TD></TR>
-    </TABLE>
-  >, fillcolor='#F8D7DA', color='black'];
-  display  [label=<
-    <TABLE BORDER='0'>
-      <TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>ディスプレイ</FONT></TD></TR>
-    </TABLE>
-  >, fillcolor='#D1ECF1', color='black'];
-  keyboard -> cpu [arrowsize=2, len=0.5];
-  cpu -> display [arrowsize=2, len=0.5];
-  memory -> cpu  [arrowsize=2, len=0.5];
-  cpu -> memory  [arrowsize=2, len=0.5];
-}}"""
-    st.graphviz_chart(graph_viz)
+        # Graphviz ソース (改良版)
+    source = f'''
+    digraph devices {{
+      graph [nodesep=1.5, ranksep=2.0];
+      node [shape=box, style=filled, fontname="Arial", fontsize=20, labeljust="l", width=4, height=2, penwidth=2];
+      memory [label=<
+        {mem_html}
+      >, fillcolor="{color_mem}", color="black"];
+      cpu    [label=<
+        {cpu_html}
+      >, fillcolor="{color_cpu}", color="black"];
+      keyboard [label="キーボード", fillcolor="#F8D7DA", color="black"];
+      display  [label="ディスプレイ", fillcolor="#D1ECF1", color="black"];
+      keyboard -> cpu [arrowsize=2, len=0.5];
+      cpu -> display [arrowsize=2, len=0.5];
+      memory -> cpu  [arrowsize=2, len=0.5];
+      cpu -> memory  [arrowsize=2, len=0.5];
+    }}
+    '''
+    st.graphviz_chart(source)
 
 # 右カラム: ステップ詳細
 with col2:
