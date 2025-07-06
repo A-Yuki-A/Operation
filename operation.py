@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import math
 
-# CSS調整
+# CSS 調整
 st.markdown(
     """
     <style>
@@ -24,20 +24,21 @@ def next_step():
 def reset():
     st.session_state.step = 0
 
-# タイトルと説明
+# タイトル
 st.title("CPU 命令実行フロー体験アプリ")
 st.caption("※ 'READ A' の A はレジスタA を表しています。")
 
-# サイドバー：入力と PC 表示
+# サイドバー: 入力とPC表示
 with st.sidebar:
     st.header("入力パネル")
     A = st.number_input("値Aを入力 (番地7 に格納)", value=0)
     B = st.number_input("値Bを入力 (番地8 に格納)", value=0)
-    # プログラムカウンタ：命令読み込みごとにカウント
-    if st.session_state.step < 3:
+    # プログラムカウンタ計算
+    step = st.session_state.step
+    if step < 3:
         pc_val = 1
     else:
-        pc_val = math.ceil((st.session_state.step - 1) / 2)
+        pc_val = math.ceil((step - 1) / 2)
     st.markdown(
         f"**プログラムカウンタ :** <span style='font-size:32px'>{pc_val}</span>",
         unsafe_allow_html=True
@@ -55,7 +56,8 @@ data = {
     '7': A, '8': B, '9': '--'
 }
 
-# ステータス表示関数
+# ステータス表示
+
 def show_status(pc=None, inst=None, regA=None, regB=None, result=None):
     st.markdown("<div class='status-box'>", unsafe_allow_html=True)
     if pc is not None:
@@ -70,53 +72,64 @@ def show_status(pc=None, inst=None, regA=None, regB=None, result=None):
         st.write(f"**演算結果**: {result}")
     st.markdown("</div>", unsafe_allow_html=True)
 
+# メインレイアウト
 step = st.session_state.step
-
-# レイアウト：左図、右ステップ詳細
 col1, col2 = st.columns([2,1])
 
-# 左：装置関係図
+# 左カラム: 装置図
 with col1:
     st.subheader("各装置の関係図 (動作中)")
-    # メモリ内容を HTML に
+    # メモリ表示
     mem_labels = "\n".join([f"番地{addr}: {data[addr]}" for addr in sorted(data.keys(), key=int)])
     mem_html = mem_labels.replace("\n", "<BR/>")
-    # PC カウンタ計算
+    # PCカウンタ
     if step < 3:
         pc = 1
     else:
         pc = math.ceil((step - 1) / 2)
-    # レジスタと結果
+    # レジスタ・結果
     regA = data['7']; regB = data['8']
     result = data['9'] if data['9'] != '--' else (regA + regB if step >= 6 else '')
     # ハイライト色
     active = 'memory' if step in (1,7) else 'cpu' if 2 <= step <=6 else None
-    color_mem = "#FFEEBA" if active=='memory' else "#FFF3CD"
-    color_cpu = "#A3E4A1" if active=='cpu' else "#D4EDDA"
+    color_mem = '#FFEEBA' if active=='memory' else '#FFF3CD'
+    color_cpu = '#A3E4A1' if active=='cpu' else '#D4EDDA'
     cpu_html = f"PC={pc}<BR/>A={regA}<BR/>B={regB}<BR/>結果={result}"
-    # グラフ定義
-    graph_viz = f'''digraph devices {{
-      graph [nodesep=1.5, ranksep=2.0];
-      node [shape=box, style=filled, fontname="Arial", fontsize=20, width=4, height=2, penwidth=2];
-      memory [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="20">{mem_html}</FONT></TD></TR></TABLE>>,
-              fillcolor="{color_mem}", color="black"];
-      cpu    [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="20">{cpu_html}</FONT></TD></TR></TABLE>>,
-              fillcolor="{color_cpu}", color="black"];
-      keyboard [label=<<TABLE BORDER="0"><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="20">キーボード</FONT></TD></TR></TABLE>>,
-                fillcolor="#F8D7DA", color="black"];
-      display  [label=<<TABLE BORDER="0"><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="20">ディスプレイ</FONT></TD></TR></TABLE>>,
-                fillcolor="#D1ECF1", color="black"];
-      keyboard -> cpu [arrowsize=2, len=0.5];
-      cpu -> display [arrowsize=2, len=0.5];
-      memory -> cpu [arrowsize=2, len=0.5];
-      cpu -> memory [arrowsize=2, len=0.5];
-    }}'''    
+    # Graphviz
+    graph_viz = f"""
+digraph devices {{
+  graph [nodesep=1.5, ranksep=2.0];
+  node [shape=box, style=filled, fontsize=20, width=4, height=2, penwidth=2];
+  memory [label=<
+    <TABLE BORDER='0' CELLBORDER='0' CELLSPACING='0'>
+      <TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>{mem_html}</FONT></TD></TR>
+    </TABLE>
+  >, fillcolor='{color_mem}', color='black'];
+  cpu    [label=<
+    <TABLE BORDER='0' CELLBORDER='0' CELLSPACING='0'>
+      <TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>{cpu_html}</FONT></TD></TR>
+    </TABLE>
+  >, fillcolor='{color_cpu}', color='black'];
+  keyboard [label=<
+    <TABLE BORDER='0'>
+      <TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>キーボード</FONT></TD></TR>
+    </TABLE>
+  >, fillcolor='#F8D7DA', color='black'];
+  display  [label=<
+    <TABLE BORDER='0'>
+      <TR><TD ALIGN='LEFT'><FONT POINT-SIZE='20'>ディスプレイ</FONT></TD></TR>
+    </TABLE>
+  >, fillcolor='#D1ECF1', color='black'];
+  keyboard -> cpu [arrowsize=2, len=0.5];
+  cpu -> display [arrowsize=2, len=0.5];
+  memory -> cpu  [arrowsize=2, len=0.5];
+  cpu -> memory  [arrowsize=2, len=0.5];
+}}"""
     st.graphviz_chart(graph_viz)
 
-# 右：ステップ詳細
+# 右カラム: ステップ詳細
 with col2:
-    def show_step(text):
-        st.markdown(f"<div class='step-header'>{text}</div>", unsafe_allow_html=True)
+    def show_step(text): st.markdown(f"<div class='step-header'>{text}</div>", unsafe_allow_html=True)
     if step >= 1:
         show_step('ステップ1: 主記憶装置にデータ／命令を格納')
         df = pd.DataFrame.from_dict(data, orient='index', columns=['内容'])
@@ -143,4 +156,4 @@ with col2:
         show_step('ステップ7: 結果を主記憶装置に書き戻し')
         data['9'] = result
         show_status(pc=4, inst=data['2'], regA=regA, regB=regB, result=result)
-        st.success(f"完了: 番地9に演算結果 {result} を格納しました。")"}]}
+        st.success(f"完了: 番地9に演算結果 {result} を格納しました。")
