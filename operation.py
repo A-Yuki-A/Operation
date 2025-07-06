@@ -74,7 +74,8 @@ col1, col2 = st.columns([2, 1])
 # 左カラム：各装置の関係図（固定描画）
 with col1:
     st.subheader("各装置の関係図 (動作中)")
-    mem_labels = "
-".join([f"番地{addr}: {data[addr]}" for addr in sorted(data.keys(), key=int)]), key=int)])
-        mem_html = mem_labels.replace("
+        mem_labels = "
+".join([f"番地{addr}: {data[addr]}" for addr in sorted(data.keys(), key=int)])
+    mem_html = mem_labels.replace("
+", "<BR/>")
 ", "<BR/>")
