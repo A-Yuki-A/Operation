@@ -10,8 +10,9 @@ def show_definitions():
         '命令レジスタ (IR)': '主記憶装置から読み出した命令を一時的に保持するレジスタ',
         '主記憶装置': '命令やデータを格納しておく記憶領域',
         '演算装置': 'データの計算（加減乗除）を行う装置',
-        '命令': 'CPUに対して何をするか指示するコード',
-        'データ': '命令が扱う数値や文字などの情報'
+        '命令': 'CPUに対して何をするか指示するコード。例として READ A,100 の A はレジスタA、100 は主記憶装置の番地です。',
+        'データ': '命令が扱う数値や文字などの情報',
+        'レジスタ A, B, C': 'CPU内部の高速にアクセスできる小さな記憶領域で、主記憶装置から読み込んだデータを一時的に保持します。'
     }
     for term, desc in defs.items():
         st.write(f'**{term}**: {desc}')
@@ -58,28 +59,32 @@ def snapshot_state():
 # 初期化
 init_state()
 
+# リセットボタン
+if st.button('🔄 リセット'):
+    st.session_state.clear()
+    init_state()
+    st.experimental_rerun()
+
 # タイトルと用語説明
 st.title('CPU 動作可視化デモ')
 with st.expander('📖 用語説明を開く'):
     show_definitions()
 
 # 現在の動作説明
-desc = ''
 inst = st.session_state.ir or ''
 if not st.session_state.running:
     desc = 'プログラムは停止しています。'
-else:
-    if st.session_state.active == 'cu':
-        desc = '制御装置が次の命令をフェッチ（取得）しています。'
-    elif st.session_state.active == 'alu':
-        desc = '演算装置がレジスタAとBのデータを使って加算を実行しています。'
-    elif st.session_state.active == 'mem':
-        if inst.startswith('READ'):
-            desc = f'主記憶装置から{inst.split()[1]}のデータを読み込んでいます。'
-        elif inst.startswith('WRITE'):
-            desc = f'レジスタ{inst.split()[1].split(",")[1]}の結果を主記憶装置に書き込んでいます。'
-        else:
-            desc = '主記憶装置でデータの読み書きを行っています。'
+elif st.session_state.active == 'cu':
+    desc = '制御装置が次の命令をフェッチ（取得）しています。'
+elif st.session_state.active == 'alu':
+    desc = '演算装置がレジスタAとBのデータを使って加算を実行しています。'
+elif st.session_state.active == 'mem':
+    if inst.startswith('READ'):
+        desc = f'主記憶装置から{inst.split()[1]}のデータを読み込んでいます。'
+    elif inst.startswith('WRITE'):
+        desc = f'レジスタ{inst.split()[1].split(",")[1]}の結果を主記憶装置に書き込んでいます。'
+    else:
+        desc = '主記憶装置でデータの読み書きを行っています。'
 st.info(desc)
 
 # 戻る／進むボタン
@@ -89,14 +94,16 @@ with col1:
         st.session_state.history.pop()
         prev = st.session_state.history[-1]
         for k, v in prev.items():
-            st.session_state[k] = copy.deepcopy(v) if isinstance(v, (dict,)) else v
+            st.session_state[k] = copy.deepcopy(v) if isinstance(v, dict) else v
 with col2:
     if st.button('次のステップへ') and st.session_state.running:
+        # フェッチ
         st.session_state.active = 'cu'
         addr = st.session_state.pc
         inst = st.session_state.memory.get(addr)
         st.session_state.ir = inst
         st.session_state.pc += 1
+        # 実行
         if inst and inst.startswith('READ'):
             st.session_state.active = 'mem'
             reg, mem_addr = inst.split()[1].split(',')
@@ -150,6 +157,6 @@ with mem_col:
         ]))
     ), 'mem')
 
-# 終了メッセージ
+# プログラム終了メッセージ
 if not st.session_state.running:
     st.success('プログラムが終了しました。アドレス102に結果が保存されています。')
