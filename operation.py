@@ -76,9 +76,11 @@ with col1:
     st.subheader("各装置の関係図 (動作中)")
     import math
     # メモリ内容を改行で結合
+        # メモリ内容を改行で結合
     mem_labels = "
 ".join([f"番地{addr}: {data[addr]}" for addr in sorted(data.keys(), key=int)])
     mem_html = mem_labels.replace("
+", "<BR/>")("
 ", "<BR/>")
     # プログラムカウンタ計算
     if step < 3:
