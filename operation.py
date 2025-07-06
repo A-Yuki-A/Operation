@@ -71,6 +71,8 @@ with st.expander('📖 用語説明を開く'):
 
 # 現在の動作説明
 inst = st.session_state.ir or ''
+# descを必ず定義する
+desc = ''
 if not st.session_state.running:
     desc = 'プログラムは停止しています。'
 elif st.session_state.active == 'cu':
