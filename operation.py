@@ -59,7 +59,7 @@ with col1:
                 st.session_state[k] = copy.deepcopy(v)
             else:
                 st.session_state[k] = v
-        st.experimental_rerun()
+        st.experimental.rerun()
 with col2:
     if st.button('次のステップへ') and st.session_state.running:
         # フェッチ
@@ -89,7 +89,7 @@ with col2:
         st.session_state.step += 1
         # 履歴に追加
         st.session_state.history.append(snapshot_state())
-        st.experimental_rerun()
+        st.experimental.rerun()
 
 # 現在の動作説明
 desc = ''
@@ -111,7 +111,6 @@ else:
 st.info(desc)
 
 # 表示用コンテナ
-
 def styled_container(content_fn, unit_key):
     color = '#fffae6' if st.session_state.active == unit_key else '#f8f9fa'
     border = '3px solid #ff9900' if st.session_state.active == unit_key else '1px solid #ddd'
