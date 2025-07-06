@@ -59,7 +59,6 @@ with col1:
                 st.session_state[k] = copy.deepcopy(v)
             else:
                 st.session_state[k] = v
-        st.experimental.rerun()
 with col2:
     if st.button('次のステップへ') and st.session_state.running:
         # フェッチ
@@ -89,7 +88,6 @@ with col2:
         st.session_state.step += 1
         # 履歴に追加
         st.session_state.history.append(snapshot_state())
-        st.experimental.rerun()
 
 # 現在の動作説明
 desc = ''
